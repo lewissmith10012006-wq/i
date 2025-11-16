@@ -17,7 +17,7 @@
     .clicker span{font-weight:700}
 
     /* Right image */
-    .right-image{position:fixed;right:12px;top:50%;transform:translateY(-50%);width:240px;height:240px;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.25);background:#eee}
+    .right-image{position:fixed;right:12px;top:50%;transform:translateY(-50%);width:240px;height:400px;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.25);background:#eee}
     .right-image img{width:100%;height:100%;object-fit:cover;display:block}
 
     /* Main table area (center) */
@@ -52,7 +52,7 @@
 </head>
 <body>
   <!-- Top-left balance -->
-  <div class="balance" id="balance">Balance: $100</div>
+  <div class="balance" id="balance">Balance: $1000</div>
 
   <!-- Left middle clicker -->
   <div class="clicker" id="clicker" title="Click me">
@@ -105,7 +105,7 @@
     */
 
     // --- state ---
-    let balance = 1000;
+    let balance = 100;
     let bet = 0;
     let deck = [];
     let player = [];
@@ -264,8 +264,8 @@
       messageEl.textContent = outcome;
     }
 
-    function renderAll(){
-      renderHand(dealerHandEl,dealer, inRound);
+    function renderAll(revealDealer=false)(){
+      renderHand(dealerHandEl,dealer, inRound && !revealDealer);
       renderHand(playerHandEl,player,false);
       renderBalance();
       hitBtn.disabled = !inRound;
@@ -291,7 +291,7 @@
     dealBtn.addEventListener('click',()=>{ startRound(); });
     hitBtn.addEventListener('click',()=>{ playerHit(); });
     standBtn.addEventListener('click',()=>{ if(!inRound) return; endRound('stand'); });
-    resetBtn.addEventListener('click',()=>{ balance=1000; bet=0; inRound=false; player=[]; dealer=[]; renderAll(); messageEl.textContent='Welcome — choose chips and place a bet'; });
+    resetBtn.addEventListener('click',()=>{ bet=0; inRound=false; player=[]; dealer=[]; renderAll(true); messageEl.textContent='Cards reset — balance kept'; });
 
     // keyboard shortcuts (optional)
     window.addEventListener('keydown',(e)=>{
@@ -305,4 +305,3 @@
   </script>
 </body>
 </html>
-

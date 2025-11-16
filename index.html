@@ -6,7 +6,7 @@
   <title>Blackjack Unlock</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #0b3d91;
       color: white;
       text-align: center;
@@ -28,16 +28,23 @@
       max-width: 300px;
       margin-top: 10px;
     }
+    .card {
+      font-size: 2rem;
+      margin: 0 5px;
+    }
+    .red {
+      color: red;
+    }
   </style>
 </head>
 <body>
-  <h1>🎲 Blackjack to Unlock</h1>
+  <h1>🃏 Blackjack to Unlock</h1>
   <div id="game">
     <p id="playerHand">Your Hand: </p>
     <p id="dealerHand">Dealer's Hand: </p>
     <p id="result"></p>
-    <button onclick="hit()">Hit</button>
-    <button onclick="stand()">Stand</button>
+    <button onclick="handleHit()">Hit</button>
+    <button onclick="handleStand()">Stand</button>
     <button onclick="startGame()">Restart</button>
   </div>
 
@@ -51,6 +58,14 @@
     let player = [];
     let dealer = [];
     let deck = [];
+    let gameOver = false;
+
+    const cardMap = {
+      'A♠': '🂡', '2♠': '🂢', '3♠': '🂣', '4♠': '🂤', '5♠': '🂥', '6♠': '🂦', '7♠': '🂧', '8♠': '🂨', '9♠': '🂩', '10♠': '🂪', 'J♠': '🂫', 'Q♠': '🂭', 'K♠': '🂮',
+      'A♥': '🂱', '2♥': '🂲', '3♥': '🂳', '4♥': '🂴', '5♥': '🂵', '6♥': '🂶', '7♥': '🂷', '8♥': '🂸', '9♥': '🂹', '10♥': '🂺', 'J♥': '🂻', 'Q♥': '🂽', 'K♥': '🂾',
+      'A♦': '🃁', '2♦': '🃂', '3♦': '🃃', '4♦': '🃄', '5♦': '🃅', '6♦': '🃆', '7♦': '🃇', '8♦': '🃈', '9♦': '🃉', '10♦': '🃊', 'J♦': '🃋', 'Q♦': '🃍', 'K♦': '🃎',
+      'A♣': '🃑', '2♣': '🃒', '3♣': '🃓', '4♣': '🃔', '5♣': '🃕', '6♣': '🃖', '7♣': '🃗', '8♣': '🃘', '9♣': '🃙', '10♣': '🃚', 'J♣': '🃛', 'Q♣': '🃝', 'K♣': '🃞'
+    };
 
     function createDeck() {
       const suits = ['♠', '♥', '♦', '♣'];
@@ -80,24 +95,32 @@
       return value;
     }
 
-    function displayHands() {
-      document.getElementById('playerHand').textContent = 'Your Hand: ' + handToString(player) + ' (' + calculateHandValue(player) + ')';
-      document.getElementById('dealerHand').textContent = 'Dealer\'s Hand: ' + handToString(dealer) + ' (' + calculateHandValue(dealer) + ')';
-    }
-
     function handToString(hand) {
-      return hand.map(card => card.value + card.suit).join(', ');
+      return hand.map(card => cardMap[card.value + card.suit] || (card.value + card.suit)).join(' ');
     }
 
-    function hit() {
+    function displayHands() {
+      document.getElementById('playerHand').innerHTML = 'Your Hand: ' + handToString(player) + ' (' + calculateHandValue(player) + ')';
+      document.getElementById('dealerHand').innerHTML = 'Dealer\'s Hand: ' + handToString(dealer) + ' (' + calculateHandValue(dealer) + ')';
+    }
+
+    function handleHit() {
+      if (gameOver) {
+        startGame();
+        return;
+      }
       player.push(deck.pop());
       displayHands();
       if (calculateHandValue(player) > 21) {
-        endGame('Bust! You lose.');
+        endGame('You lose, try again.', true);
       }
     }
 
-    function stand() {
+    function handleStand() {
+      if (gameOver) {
+        startGame();
+        return;
+      }
       while (calculateHandValue(dealer) < 17) {
         dealer.push(deck.pop());
       }
@@ -110,12 +133,15 @@
       } else if (playerVal === dealerVal) {
         endGame('It\'s a tie!');
       } else {
-        endGame('Dealer wins!');
+        endGame('You lose, try again.', true);
       }
     }
 
-    function endGame(message) {
-      document.getElementById('result').textContent = message;
+    function endGame(message, isLoss = false) {
+      const result = document.getElementById('result');
+      result.textContent = message;
+      result.className = isLoss ? 'red' : '';
+      gameOver = true;
     }
 
     function startGame() {
@@ -124,6 +150,8 @@
       dealer = [deck.pop(), deck.pop()];
       document.getElementById('hiddenContent').style.display = 'none';
       document.getElementById('result').textContent = '';
+      document.getElementById('result').className = '';
+      gameOver = false;
       displayHands();
     }
 

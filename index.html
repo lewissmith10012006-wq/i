@@ -108,22 +108,19 @@
     let gameOver = false;
     let balance = 100;
 
-    const cardMap = {
-      'A♠': '🂡', '2♠': '🂢', '3♠': '🂣', '4♠': '🂤', '5♠': '🂥', '6♠': '🂦', '7♠': '🂧', '8♠': '🂨', '9♠': '🂩',
-      'J♠': '🂫', 'Q♠': '🂭', 'K♠': '🂮',
-      'A♥': '🂱', '2♥': '🂲', '3♥': '🂳', '4♥': '🂴', '5♥': '🂵', '6♥': '🂶', '7♥': '🂷', '8♥': '🂸', '9♥': '🂹',
-      'J♥': '🂻', 'Q♥': '🂽', 'K♥': '🂾',
-      'A♦': '🃁', '2♦': '🃂', '3♦': '🃃', '4♦': '🃄', '5♦': '🃅', '6♦': '🃆', '7♦': '🃇', '8♦': '🃈', '9♦': '🃉',
-      'J♦': '🃋', 'Q♦': '🃍', 'K♦': '🃎',
-      'A♣': '🃑', '2♣': '🃒', '3♣': '🃓', '4♣': '🃔', '5♣': '🃕', '6♣': '🃖', '7♣': '🃗', '8♣': '🃘', '9♣': '🃙',
-      'J♣': '🃛', 'Q♣': '🃝', 'K♣': '🃞'
-    };
+    function updateBalanceDisplay() {
+      document.getElementById('balance').textContent = `Balance: $${balance}`;
+    }
 
+    function incrementBalance() {
+      balance += 1;
+      updateBalanceDisplay();
+    }
 
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
     function createDeck() {
-      const suits = ['♠', '♥', '♦', '♣'];
-      const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
       deck = [];
       for (let suit of suits) {
         for (let value of values) {
@@ -149,21 +146,29 @@
       return value;
     }
 
-    function handToString(hand, revealAll = true) {
-      return hand.map((card, i) => {
-        if (!revealAll && i === 1) return '🂠';
-        return cardMap[card.value + card.suit];
-      }).join(' ');
+    function getCardSymbol(card) {
+      const symbols = {
+        'A♠': '🂡', '2♠': '🂢', '3♠': '🂣', '4♠': '🂤', '5♠': '🂥', '6♠': '🂦', '7♠': '🂧', '8♠': '🂨', '9♠': '🂩', '10♠': '10♠', 'J♠': '🂫', 'Q♠': '🂭', 'K♠': '🂮',
+        'A♥': '🂱', '2♥': '🂲', '3♥': '🂳', '4♥': '🂴', '5♥': '🂵', '6♥': '🂶', '7♥': '🂷', '8♥': '🂸', '9♥': '🂹', '10♥': '10♥', 'J♥': '🂻', 'Q♥': '🂽', 'K♥': '🂾',
+        'A♦': '🃁', '2♦': '🃂', '3♦': '🃃', '4♦': '🃄', '5♦': '🃅', '6♦': '🃆', '7♦': '🃇', '8♦': '🃈', '9♦': '🃉', '10♦': '10♦', 'J♦': '🃋', 'Q♦': '🃍', 'K♦': '🃎',
+        'A♣': '🃑', '2♣': '🃒', '3♣': '🃓', '4♣': '🃔', '5♣': '🃕', '6♣': '🃖', '7♣': '🃗', '8♣': '🃘', '9♣': '🃙', '10♣': '10♣', 'J♣': '🃛', 'Q♣': '🃝', 'K♣': '🃞'
+      };
+      return symbols[card.value + card.suit] || `${card.value}${card.suit}`;
     }
 
     function handToString(hand, revealAll = true) {
       return hand.map((card, i) => {
         if (!revealAll && i === 1) return '🂠';
-        const key = card.value + card.suit;
-        return cardMap[key] || `${card.value}${card.suit}`;
+        return getCardSymbol(card);
       }).join(' ');
     }
 
+    function displayHands(revealDealer = false) {
+      document.getElementById('dealerHand').innerHTML = handToString(dealer, revealDealer);
+      document.getElementById('dealerValue').textContent = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
+      document.getElementById('playerHand').innerHTML = handToString(player);
+      document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
+    }
 
     function handleHit() {
       if (gameOver) {
@@ -194,5 +199,10 @@
       const dealerVal = calculateHandValue(dealer);
       if (dealerVal > 21 || playerVal > dealerVal) {
         endGame('You win!');
-        document.getElementById('hiddenContent').style.display
-
+        document.getElementById('hiddenContent').style.display = 'block';
+      } else if (playerVal === dealerVal) {
+        endGame('It\'s a tie!');
+      } else {
+        endGame('You lose, try again.', true);
+      }
+    }

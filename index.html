@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #006400; /* Dark green */
+      background: #006400;
       color: white;
       text-align: center;
       padding: 20px;
@@ -38,6 +38,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 2rem;
+      user-select: none;
     }
 
     #game, #result, #hiddenContent {
@@ -77,7 +79,7 @@
 </head>
 <body>
   <div id="balance">Balance: $100</div>
-  <div id="clicker" onclick="incrementBalance()"></div>
+  <div id="clicker" onclick="incrementBalance()">&nbsp;</div>
 
   <h1>🃏 Blackjack to Unlock</h1>
   <div id="game">
@@ -141,20 +143,16 @@
       return value;
     }
 
-    function handToString(hand) {
-      return hand.map(card => cardMap[card.value + card.suit]).join(' ');
+    function handToString(hand, revealAll = true) {
+      return hand.map((card, i) => {
+        if (!revealAll && i === 1) return '🂠';
+        return cardMap[card.value + card.suit];
+      }).join(' ');
     }
 
     function displayHands(revealDealer = false) {
-      const dealerDisplay = dealer.map((card, i) => {
-        if (i === 1 && !revealDealer) return '🂠';
-        return cardMap[card.value + card.suit];
-      }).join(' ');
-      const dealerValue = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
-
-      document.getElementById('dealerHand').innerHTML = dealerDisplay;
-      document.getElementById('dealerValue').textContent = dealerValue;
-
+      document.getElementById('dealerHand').innerHTML = handToString(dealer, revealDealer);
+      document.getElementById('dealerValue').textContent = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
       document.getElementById('playerHand').innerHTML = handToString(player);
       document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
     }
@@ -171,7 +169,7 @@
       if (playerVal > 21) {
         endGame('You lose, try again.', true);
       } else if (playerVal === 21) {
-        handleStand(); // auto-stand on 21
+        handleStand();
       }
     }
 
@@ -188,16 +186,4 @@
       const dealerVal = calculateHandValue(dealer);
       if (dealerVal > 21 || playerVal > dealerVal) {
         endGame('You win!');
-        document.getElementById('hiddenContent').style.display = 'block';
-      } else if (playerVal === dealerVal) {
-        endGame('It\'s a tie!');
-      } else {
-        endGame('You lose, try again.', true);
-      }
-    }
-
-    function endGame(message, isLoss = false) {
-      const result = document.getElementById('result');
-      result.textContent = message;
-      result.className = isLoss ? 'red' : '';
-      gameOver = true;
+        document.getElementById('hiddenContent').style.display

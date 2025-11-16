@@ -303,6 +303,22 @@
 
     // initial render
     renderAll();
-  </script>
+    // Rebuild chips buttons
+  document.addEventListener('DOMContentLoaded',()=>{
+    const chipsDiv=document.getElementById('chips');
+    if(chipsDiv){
+      chipsDiv.innerHTML="";
+      [1,5,10,25,50,100,500].forEach(v=>{
+        const b=document.createElement('button');
+        b.textContent = "$"+v;
+        b.style.margin = '4px';
+        b.onclick = ()=>{
+          if(!inRound && balance>=v){ bet+=v; updateBetDisplay(); }
+        };
+        chipsDiv.appendChild(b);
+      });
+    }
+  });
+</script>
 </body>
 </html>

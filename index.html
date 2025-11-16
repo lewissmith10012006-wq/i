@@ -1,63 +1,133 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bollock Head</title>
-<style>
-/* Simple, responsive layout */
-html,body{height:100%;margin:0}
-body{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:16px;
-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-background:#f7f7f7;
-padding:24px;
-box-sizing:border-box;
-}
-
-
-h1{
-color:red; /* heading color */
-font-size: clamp(24px, 5vw, 48px);
-margin:0;
-letter-spacing:0.5px;
-text-align:center;
-}
-
-
-.image-wrap{
-width: min(900px, 95%);
-border-radius:8px;
-overflow:hidden;
-box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-background: white;
-}
-
-
-img{display:block;width:100%;height:auto}
-
-
-/* Small helper: change the heading text in the markup below */
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blackjack Unlock</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b3d91;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    #game, #result, #hiddenContent {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+    }
+    #hiddenContent {
+      display: none;
+      margin-top: 30px;
+    }
+    img {
+      max-width: 300px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-<!-- IMPORTANT: I will not generate content that includes hateful or derogatory slurs targeting protected groups. -->
-<!-- The heading below uses a neutral placeholder. Replace the text inside the <h1> with your preferred (non-offensive) phrase. -->
+  <h1>🎲 Blackjack to Unlock</h1>
+  <div id="game">
+    <p id="playerHand">Your Hand: </p>
+    <p id="dealerHand">Dealer's Hand: </p>
+    <p id="result"></p>
+    <button onclick="hit()">Hit</button>
+    <button onclick="stand()">Stand</button>
+    <button onclick="startGame()">Restart</button>
+  </div>
 
+  <div id="hiddenContent">
+    <h2>🎉 You Win! Here's the Hidden Content:</h2>
+    <p>This is the secret message behind the game.</p>
+    <img src="https://via.placeholder.com/300x200.png?text=Secret+Image" alt="Secret" />
+  </div>
 
-<h1 id="title">BIG GIMP</h1>
+  <script>
+    let player = [];
+    let dealer = [];
+    let deck = [];
 
+    function createDeck() {
+      const suits = ['♠', '♥', '♦', '♣'];
+      const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+      deck = [];
+      for (let suit of suits) {
+        for (let value of values) {
+          deck.push({ value, suit });
+        }
+      }
+      deck.sort(() => Math.random() - 0.5);
+    }
 
-<div class="image-wrap">
-<!-- Replace the image URL below with your own image file or URL -->
-<img src="photo.jpg" alt="My photo" style="width: 50%; display: block; margin: 0 auto;" />
-</div>
+    function getCardValue(card) {
+      if (['J', 'Q', 'K'].includes(card.value)) return 10;
+      if (card.value === 'A') return 11;
+      return parseInt(card.value);
+    }
 
+    function calculateHandValue(hand) {
+      let value = hand.reduce((sum, card) => sum + getCardValue(card), 0);
+      let aces = hand.filter(card => card.value === 'A').length;
+      while (value > 21 && aces > 0) {
+        value -= 10;
+        aces--;
+      }
+      return value;
+    }
 
+    function displayHands() {
+      document.getElementById('playerHand').textContent = 'Your Hand: ' + handToString(player) + ' (' + calculateHandValue(player) + ')';
+      document.getElementById('dealerHand').textContent = 'Dealer\'s Hand: ' + handToString(dealer) + ' (' + calculateHandValue(dealer) + ')';
+    }
+
+    function handToString(hand) {
+      return hand.map(card => card.value + card.suit).join(', ');
+    }
+
+    function hit() {
+      player.push(deck.pop());
+      displayHands();
+      if (calculateHandValue(player) > 21) {
+        endGame('Bust! You lose.');
+      }
+    }
+
+    function stand() {
+      while (calculateHandValue(dealer) < 17) {
+        dealer.push(deck.pop());
+      }
+      displayHands();
+      const playerVal = calculateHandValue(player);
+      const dealerVal = calculateHandValue(dealer);
+      if (dealerVal > 21 || playerVal > dealerVal) {
+        endGame('You win!');
+        document.getElementById('hiddenContent').style.display = 'block';
+      } else if (playerVal === dealerVal) {
+        endGame('It\'s a tie!');
+      } else {
+        endGame('Dealer wins!');
+      }
+    }
+
+    function endGame(message) {
+      document.getElementById('result').textContent = message;
+    }
+
+    function startGame() {
+      createDeck();
+      player = [deck.pop(), deck.pop()];
+      dealer = [deck.pop(), deck.pop()];
+      document.getElementById('hiddenContent').style.display = 'none';
+      document.getElementById('result').textContent = '';
+      displayHands();
+    }
+
+    startGame();
+  </script>
 </body>
-
 </html>

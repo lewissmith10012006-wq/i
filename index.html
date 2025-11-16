@@ -131,7 +131,7 @@
     const resetBtn = document.getElementById('reset');
     const placeBetBtn = document.getElementById('place-bet');
 
-    const chipValues = [1,5,25,50,100,500];
+    const chipValues = [$1$2]];
 
     function renderBalance(){
       balanceEl.textContent = `Balance: $${balance}`;
@@ -166,24 +166,11 @@
     function startRound(){
       if(inRound) return; if(bet<=0){ flashMessage('Place a bet first'); return; }
       inRound=true; buildDeck(); shuffle(); player=[]; dealer=[];
-      player.push(draw()); dealer.push(draw()); player.push(draw()); dealer.push(draw()); renderAll();
-      const pVal = handValue(player);
-      if(pVal===21){ endRound('player_blackjack'); }
-      else { flashMessage('Your move — Hit or Stand', true); }
-    }
-
-    function playerHit(){ if(!inRound) return; player.push(draw()); renderAll(); const val = handValue(player); if(val>21){ endRound('player_bust'); } }
-
-    // Dealer delay logic: you requested "dealer total ≤ player total − 10" to use >= logic
-    function dealerDelayMs(){ const d = handValue(dealer); const p = handValue(player);
-      // interpret user update: use >= (greater-than-or-equal) logic for this rule
-      // special when: d >= (p - 10)  OR (d > 12 && p <= 16)
-      if(d >= (p - 10)) return 5000;
-      if(d > 12 && p <= 16) return 5000;
-      return 2000;
-    }
-
-    async function dealerPlay(){ renderAll(true); while(handValue(dealer) < 17){ const delay = dealerDelayMs(); await new Promise(r=>setTimeout(r, delay)); dealer.push(draw()); renderAll(true); } }
+      player.push(draw()); const newCard = draw(); dealer.push(newCard);
+// instantly show placeholder but hide value
+renderAll(false);
+await new Promise(r=>setTimeout(r, delay));
+renderAll(true); while(handValue(dealer) < 17){ const delay = dealerDelayMs(); await new Promise(r=>setTimeout(r, delay)); dealer.push(draw()); renderAll(true); } }
 
     async function endRound(reason){
       if(reason === 'player_bust'){ renderAll(true); }

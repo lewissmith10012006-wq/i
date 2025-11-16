@@ -52,7 +52,7 @@
 </head>
 <body>
   <!-- Top-left balance -->
-  <div class="balance" id="balance">Balance: $1000</div>
+  <div class="balance" id="balance">Balance: $100</div>
 
   <!-- Left middle clicker -->
   <div class="clicker" id="clicker" title="Click me">
@@ -261,7 +261,7 @@
       messageEl.textContent = outcome;
     }
 
-    function renderAll(revealDealer=false)(){
+    function renderAll(revealDealer=false){
       renderHand(dealerHandEl,dealer, inRound && !revealDealer);
       renderHand(playerHandEl,player,false);
       renderBalance();

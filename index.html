@@ -48,7 +48,32 @@
 
     /* small responsive tweaks */
     @media(max-width:880px){.right-image{display:none}.clicker{left:8px}.balance{left:8px}}
-  </style>
+  
+/* CHIP STYLES START */
+.chip {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 4px solid white;
+  background: radial-gradient(circle, #d32f2f 40%, #b71c1c 90%);
+  color: white;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  transition: transform 0.15s;
+}
+.chip:hover {
+  transform: scale(1.1);
+}
+.chip:active {
+  transform: scale(0.95);
+}
+/* CHIP STYLES END */
+</style>
 </head>
 <body>
   <!-- Top-left balance -->
@@ -310,6 +335,7 @@
       chipsDiv.innerHTML="";
       [1,5,10,25,50,100,500].forEach(v=>{
         const b=document.createElement('button');
+    b.className='chip';
         b.textContent = "$"+v;
         b.style.margin = '4px';
         b.onclick = ()=>{

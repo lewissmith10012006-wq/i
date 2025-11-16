@@ -31,8 +31,12 @@
     .red {
       color: red;
     }
+    .hand-label {
+      font-size: 1.2rem;
+      margin-top: 20px;
+    }
     .cards {
-      font-size: 2rem;
+      font-size: 3rem;
       margin: 10px 0;
     }
   </style>
@@ -40,8 +44,12 @@
 <body>
   <h1>🃏 Blackjack to Unlock</h1>
   <div id="game">
-    <div id="playerHand" class="cards"></div>
+    <div class="hand-label">Dealer's Hand: <span id="dealerValue"></span></div>
     <div id="dealerHand" class="cards"></div>
+
+    <div class="hand-label">Your Hand: <span id="playerValue"></span></div>
+    <div id="playerHand" class="cards"></div>
+
     <p id="result"></p>
     <button onclick="handleHit()">Hit</button>
     <button onclick="handleStand()">Stand</button>
@@ -100,8 +108,10 @@
     }
 
     function displayHands() {
-      document.getElementById('playerHand').innerHTML = `Your Hand: ${handToString(player)} (${calculateHandValue(player)})`;
-      document.getElementById('dealerHand').innerHTML = `Dealer's Hand: ${handToString(dealer)} (${calculateHandValue(dealer)})`;
+      document.getElementById('playerHand').innerHTML = handToString(player);
+      document.getElementById('dealerHand').innerHTML = handToString(dealer);
+      document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
+      document.getElementById('dealerValue').textContent = `(${calculateHandValue(dealer)})`;
     }
 
     function handleHit() {

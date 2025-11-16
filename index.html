@@ -1,352 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Blackjack</title>
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #0b6b2a;
-        font-family: Arial, sans-serif;
-        color: white;
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-    }
+  body {
+    background: #0b3d0b;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+  }
+  #table {
+    margin: 20px auto;
+    padding: 20px;
+    width: 900px;
+    border-radius: 20px;
+    background: #145214;
+    box-shadow: 0 0 20px #000;
+  }
+  .hand {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .card-img {
+    width: 80px;
+    height: 120px;
+    margin: 5px;
+  }
 
-    #side {
-        width: 220px;
-        padding: 20px;
-    }
+  /* CASINO CHIP STYLE */
+  .chip {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border: 6px solid rgba(255,255,255,0.85);
+    margin: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .chip:active {
+    transform: scale(0.9);
+  }
+  .value1 { background: white; color: black; }
+  .value5 { background: red; }
+  .value25 { background: green; }
+  .value50 { background: blue; }
+  .value100 { background: black; }
+  .value500 { background: purple; }
 
-    #balanceDisplay {
-        background: white;
-        color: black;
-        font-size: 22px;
-        padding: 10px 18px;
-        border-radius: 12px;
-        display: inline-block;
-        margin-bottom: 20px;
-        box-shadow: 0px 2px 10px rgba(0,0,0,0.4);
-    }
-
-    #chips {
-        margin-top: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .chip {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        font-weight: bold;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: 4px solid white;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-        user-select: none;
-    }
-
-    /* Vegas colors */
-    .chip-1   { background: white; color: black; }
-    .chip-5   { background: #d40000; }
-    .chip-25  { background: #0da400; }
-    .chip-50  { background: #0050ff; }
-    .chip-100 { background: black; }
-    .chip-500 { background: #7b00a8; }
-
-    #table {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #gameArea {
-        background: rgba(0,0,0,0.2);
-        width: 70%;
-        height: 82%;
-        border-radius: 25px;
-        padding: 25px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        box-shadow: 0px 0px 20px rgba(0,0,0,0.4);
-    }
-
-    .handArea {
-        min-height: 120px;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .card {
-        width: 70px;
-        height: 100px;
-        background: white;
-        border-radius: 6px;
-        color: black;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-    }
-
-    button {
-        padding: 10px 15px;
-        font-size: 18px;
-        border: none;
-        cursor: pointer;
-        border-radius: 10px;
-        margin: 0 6px;
-    }
-
-    #controls {
-        margin-bottom: 10px;
-    }
-
-    #status {
-        margin-top: 10px;
-        font-size: 20px;
-        min-height: 30px;
-    }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
 </style>
 </head>
 <body>
-
-<div id="side">
-    <div id="balanceDisplay">Balance: $100</div>
-
-    <h3>Chips</h3>
-    <div id="chips"></div>
-
-    <h3>Bet: <span id="betDisplay">$0</span></h3>
-    <button id="placeBetBtn">Place Bet</button>
-</div>
-
 <div id="table">
-    <div id="gameArea">
-        
-        <div>
-            <h2>Dealer</h2>
-            <div id="dealerHand" class="handArea"></div>
-        </div>
+  <h1>Blackjack</h1>
 
-        <div>
-            <h2>Player</h2>
-            <div id="playerHand" class="handArea"></div>
-        </div>
+  <h2>Dealer</h2>
+  <div id="dealer-hand" class="hand"></div>
 
-        <div id="controls">
-            <button id="dealBtn">Deal</button>
-            <button id="hitBtn" disabled>Hit</button>
-            <button id="standBtn" disabled>Stand</button>
-            <button id="resetBtn">Reset</button>
-        </div>
+  <h2>You</h2>
+  <div id="player-hand" class="hand"></div>
 
-        <div id="status">Welcome — choose chips and place a bet</div>
-    </div>
+  <h2 id="message"></h2>
+
+  <p id="balance-display">Balance: $1000</p>
+  <p id="bet-display">Current Bet: $0</p>
+
+  <div id="chips"></div>
+
+  <button id="deal-btn">Deal</button>
+  <button id="hit-btn">Hit</button>
+  <button id="stand-btn">Stand</button>
+  <button id="reset-btn">Reset Game</button>
 </div>
 
 <script>
-let balance = 100;
+let balance = 1000;
 let bet = 0;
 let deck = [];
-let dealer = [];
 let player = [];
+let dealer = [];
 let inRound = false;
 
-// DOM references
-const balanceEl = document.getElementById("balanceDisplay");
-const betEl = document.getElementById("betDisplay");
-const dealerHandEl = document.getElementById("dealerHand");
-const playerHandEl = document.getElementById("playerHand");
-const statusEl = document.getElementById("status");
+const dealerEl = document.getElementById("dealer-hand");
+const playerEl = document.getElementById("player-hand");
+const messageEl = document.getElementById("message");
+const balanceEl = document.getElementById("balance-display");
+const betEl = document.getElementById("bet-display");
 
-document.getElementById("placeBetBtn").onclick = placeBet;
-document.getElementById("dealBtn").onclick = deal;
-document.getElementById("hitBtn").onclick = hit;
-document.getElementById("standBtn").onclick = stand;
-document.getElementById("resetBtn").onclick = resetGame;
-
-// Build chips
-const chipValues = [1, 5, 25, 50, 100, 500];
-const chipsDiv = document.getElementById("chips");
-
-chipValues.forEach(v => {
-    const c = document.createElement("div");
-    c.className = `chip chip-${v}`;
-    c.textContent = `$${v}`;
-    c.onclick = () => addChip(v);
-    chipsDiv.appendChild(c);
-});
-
-function addChip(v) {
-    if (inRound) return;
-    bet += v;
-    updateBetDisplay();
+function buildDeck() {
+  const suits = ["C", "D", "H", "S"]; // clubs diamonds hearts spades
+  const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+  deck = [];
+  for (let s of suits) {
+    for (let r of ranks) deck.push(r + s);
+  }
+  deck.sort(() => Math.random() - 0.5);
 }
 
-function updateBetDisplay() {
-    betEl.textContent = `$${bet}`;
+function cardValue(card) {
+  const r = card.slice(0, -1);
+  if (r === "A") return 11;
+  if (["K", "Q", "J"].includes(r)) return 10;
+  return parseInt(r);
 }
 
-function placeBet() {
-    if (bet < 1) {
-        statusEl.textContent = "You must place a bet first.";
-        return;
-    }
-    statusEl.textContent = "Bet placed. Press Deal.";
+function handValue(hand) {
+  let total = 0;
+  let aces = 0;
+  for (let c of hand) {
+    let v = cardValue(c);
+    total += v;
+    if (c[0] === "A") aces++;
+  }
+  while (total > 21 && aces > 0) {
+    total -= 10;
+    aces--;
+  }
+  return total;
 }
 
-function resetDeck() {
-    deck = [];
-    const suits = ["♣","♦","♥","♠"];
-    const vals = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+function renderHand(el, hand, hideFirst = false) {
+  el.innerHTML = '';
+  hand.forEach((card, index) => {
+    const img = document.createElement('img');
+    img.className = 'card-img';
+    if (hideFirst && index === 0) img.src = 'https://deckofcardsapi.com/static/img/back.png';
+    else img.src = `https://deckofcardsapi.com/static/img/${card}.png`;
+    el.appendChild(img);
+  });
+}
 
-    for (let s of suits) {
-        for (let v of vals) {
-            deck.push({value: v, suit: s});
-        }
-    }
-
-    // Shuffle
-    for (let i = deck.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
+function render() {
+  renderHand(dealerEl, dealer, inRound);
+  renderHand(playerEl, player, false);
+  balanceEl.textContent = `Balance: $${balance}`;
+  betEl.textContent = `Current Bet: $${bet}`;
 }
 
 function draw() {
-    return deck.pop();
+  return deck.pop();
 }
 
-function valueOf(card) {
-    if (["J","Q","K"].includes(card.value)) return 10;
-    if (card.value === "A") return 11;
-    return parseInt(card.value);
+async function dealerPlay() {
+  while (handValue(dealer) < 17) {
+    const dealerTotal = handValue(dealer);
+    const playerTotal = handValue(player);
+
+    // Special delay rule
+    if (dealerTotal >= playerTotal - 10 && (dealerTotal >= 12 && playerTotal <= 16)) {
+      await new Promise(r => setTimeout(r, 5000));
+    } else {
+      await new Promise(r => setTimeout(r, 2000));
+    }
+
+    dealer.push(draw());
+    render();
+  }
 }
 
-function handValue(h) {
-    let total = h.reduce((t, c) => t + valueOf(c), 0);
-    let aces = h.filter(c => c.value === "A").length;
-    while (total > 21 && aces--) total -= 10;
-    return total;
-}
+async function endRound(playerBust = false) {
+  await dealerPlay();
+  const p = handValue(player);
+  const d = handValue(dealer);
+  let msg = '';
 
-function renderHand(el, hand) {
-    el.innerHTML = "";
-    hand.forEach(card => {
-        let c = document.createElement("div");
-        c.className = "card";
-        c.textContent = `${card.value}${card.suit}`;
-        el.appendChild(c);
-    });
+  if (playerBust) {
+    msg = `Bust! You lose $${bet}`;
+    balance -= bet;
+  } else if (d > 21 || p > d) {
+    msg = `You win $${bet}`;
+    balance += bet;
+  } else if (p === d) {
+    msg = 'Push — Bet returned';
+  } else {
+    msg = `You lose $${bet}`;
+    balance -= bet;
+  }
+
+  inRound = false;
+  bet = 0;
+  messageEl.textContent = msg;
+  render();
 }
 
 function deal() {
-    if (inRound) return;
-    if (bet < 1) {
-        statusEl.textContent = "Place a bet first.";
-        return;
-    }
+  if (bet === 0 || inRound) return;
+  inRound = true;
+  messageEl.textContent = '';
 
-    inRound = true;
-    dealer = [];
-    player = [];
+  buildDeck();
+  player = [draw(), draw()];
+  dealer = [draw(), draw()];
+  render();
 
-    resetDeck();
-
-    player.push(draw(), draw());
-    dealer.push(draw(), draw());
-
-    renderAll();
-    statusEl.textContent = "Hit or Stand?";
-}
-
-function renderAll() {
-    renderHand(playerHandEl, player);
-    renderHand(dealerHandEl, dealer);
-
-    balanceEl.textContent = `Balance: $${balance}`;
-
-    document.getElementById("hitBtn").disabled = !inRound;
-    document.getElementById("standBtn").disabled = !inRound;
+  if (handValue(player) === 21) endRound(false);
 }
 
 function hit() {
-    if (!inRound) return;
-
-    player.push(draw());
-    renderAll();
-
-    if (handValue(player) > 21) {
-        endRound("bust");
-    }
+  if (!inRound) return;
+  player.push(draw());
+  render();
+  if (handValue(player) > 21) endRound(true);
 }
 
 function stand() {
-    if (!inRound) return;
-    dealerPlay();
-}
-
-function dealerPlay() {
-    while (handValue(dealer) < 17) {
-        dealer.push(draw());
-    }
-    endRound("resolve");
-}
-
-function endRound(reason) {
-    inRound = false;
-
-    let p = handValue(player);
-    let d = handValue(dealer);
-
-    let msg = "";
-
-    if (reason === "bust") {
-        msg = `You bust and lose $${bet}`;
-        balance -= bet;
-    } 
-    else {
-        if (d > 21 || p > d) {
-            msg = `You win $${bet}`;
-            balance += bet;
-        } else if (p === d) {
-            msg = "Push — bet returned";
-        } else {
-            msg = `You lose $${bet}`;
-            balance -= bet;
-        }
-    }
-
-    bet = 0;
-    updateBetDisplay();
-
-    renderAll();
-    statusEl.textContent = msg;
+  if (!inRound) return;
+  endRound(false);
 }
 
 function resetGame() {
-    balance = 100;
-    bet = 0;
-    updateBetDisplay();
-    dealer = [];
-    player = [];
-    renderAll();
-    statusEl.textContent = "Welcome — choose chips and place a bet";
+  balance = 1000;
+  bet = 0;
+  player = [];
+  dealer = [];
+  inRound = false;
+  messageEl.textContent = '';
+  render();
 }
-</script>
 
+// CHIP SYSTEM
+const chipValues = [1, 5, 25, 50, 100, 500];
+
+function buildChips() {
+  const div = document.getElementById("chips");
+  div.innerHTML = '';
+  chipValues.forEach(v => {
+    const chip = document.createElement('div');
+    chip.className = `chip value${v}`;
+    chip.textContent = `$${v}`;
+    chip.addEventListener('click', () => {
+      if (!inRound && balance >= v) bet += v;
+      render();
+    });
+    div.appendChild(chip);
+  });
+}
+
+// Button events
+document.getElementById("deal-btn").onclick = deal;
+document.getElementById("hit-btn").onclick = hit;
+document.getElementById("stand-btn").onclick = stand;
+document.getElementById("reset-btn").onclick = resetGame;
+
+buildChips();
+render();
+</script>
 </body>
 </html>

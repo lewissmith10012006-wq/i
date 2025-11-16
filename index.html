@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Blackjack — Green Table (Fixed)</title>
+  <title>Blackjack — Green Table</title>
   <style>
     :root{--table:#0b7a2b;--card:#fff;--accent:#222}
     html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
@@ -52,7 +52,7 @@
 </head>
 <body>
   <!-- Top-left balance -->
-  <div class="balance" id="balance">Balance: $100</div>
+  <div class="balance" id="balance">Balance: $1000</div>
 
   <!-- Left middle clicker -->
   <div class="clicker" id="clicker" title="Click me">
@@ -66,32 +66,29 @@
 
   <div class="table-wrap">
     <div class="table" role="main">
-      <div class="row">
-        <div class="area">
-          <div style="color:#fff;font-weight:700;margin-bottom:8px">Dealer</div>
-          <div class="hand" id="dealer-hand"></div>
-        </div>
-        <div class="area" style="text-align:center">
-          <div style="color:#fff;font-weight:700;margin-bottom:8px">Game</div>
-          <div class="controls">
-            <div class="chips" id="chips">
-              <!-- chips inserted by JS -->
-            </div>
-            <div class="bet-display" id="bet-display">Bet: $0</div>
-            <button id="place-bet">Place Bet</button>
-          </div>
-        </div>
-        <div class="area">
-          <div style="color:#fff;font-weight:700;margin-bottom:8px">Player</div>
-          <div class="hand" id="player-hand"></div>
-        </div>
-      </div>
+      <div class="row" style="flex-direction:column;align-items:center;text-align:center">
+  <div class="area">
+    <div style="color:#fff;font-weight:700;margin-bottom:8px">Dealer</div>
+    <div class="hand" id="dealer-hand"></div>
+  </div>
+  <div class="area">
+    <div class="controls" style="justify-content:center;margin:20px 0">
+      <div class="chips" id="chips"></div>
+      <div class="bet-display" id="bet-display">Bet: $0</div>
+      <button id="place-bet">Place Bet</button>
+    </div>
+  </div>
+  <div class="area">
+    <div style="color:#fff;font-weight:700;margin-bottom:8px">Player</div>
+    <div class="hand" id="player-hand"></div>
+  </div>
+</div>
 
-      <div style="display:flex;justify-content:center;gap:10px;padding-top:10px">
+<div style="display:flex;justify-content:center;gap:10px;padding-top:10px">
         <button id="deal">Deal</button>
         <button id="hit">Hit</button>
         <button id="stand">Stand</button>
-        <button id="reset">Reset Cards</button>
+        <button id="reset">Reset</button>
       </div>
 
       <div style="margin-top:16px;text-align:center;color:#fff;font-weight:700" id="message">Welcome — choose chips and place a bet</div>
@@ -99,17 +96,14 @@
   </div>
 
   <script>
-    /* Fixed Blackjack engine with betting and balance
-       - Starting balance: $100
-       - Clicker increments balance by $1
-       - Place Bet button locks the bet (does NOT deduct until round resolution)
-       - Reset button only clears cards, keeps balance
+    /* Simple Blackjack engine with betting and balance
+       - One HTML file solution for GitHub Pages
+       - User should add photo.jpg in the same folder
     */
 
     // --- state ---
     let balance = 100;
     let bet = 0;
-    let betPlaced = false;
     let deck = [];
     let player = [];
     let dealer = [];
@@ -144,8 +138,8 @@
         c.textContent = `$${v}`;
         c.title = `Add $${v} to bet`;
         c.addEventListener('click',()=>{
-          if(inRound || betPlaced){
-            flashMessage('Round in progress or bet already placed — wait until next round');
+          if(inRound){
+            flashMessage('Round in progress — wait until next round');
             return;
           }
           if(bet + v > balance){
@@ -161,7 +155,7 @@
 
     function flashMessage(t){
       messageEl.textContent = t;
-      setTimeout(()=>{ if(!inRound && !betPlaced) messageEl.textContent='Choose chips and place a bet'; },1600);
+      setTimeout(()=>{ if(!inRound) messageEl.textContent='Choose chips and place a bet'; },1600);
     }
 
     // --- deck helpers ---
@@ -216,14 +210,15 @@
 
     function startRound(){
       if(inRound) return;
-      if(!betPlaced){ flashMessage('Place a bet first'); return; }
+      if(bet<=0){ flashMessage('Place a bet first'); return; }
       inRound=true;
       buildDeck(); shuffle();
       player=[]; dealer=[];
       player.push(draw()); dealer.push(draw()); player.push(draw()); dealer.push(draw());
-      renderAll(false);
+      renderAll();
       // blackjack immediate checks
       const pVal = handValue(player);
+      const dVal = handValue(dealer);
       if(pVal===21){
         // player blackjack
         endRound('player_blackjack');
@@ -233,7 +228,7 @@
     }
 
     function playerHit(){
-      if(!inRound) return; player.push(draw()); renderAll(false);
+      if(!inRound) return; player.push(draw()); renderAll();
       const val = handValue(player);
       if(val>21){ endRound('player_bust'); }
     }
@@ -244,7 +239,7 @@
 
     function endRound(reason){
       // reveal dealer then decide
-      dealerPlay(); renderAll(true);
+      dealerPlay(); renderAll(false);
       const p = handValue(player); const d = handValue(dealer);
       let outcome = '';
       if(reason==='player_blackjack'){
@@ -262,19 +257,18 @@
       inRound=false;
       // reset bet after resolution
       bet = 0;
-      betPlaced = false;
       renderBalance();
       messageEl.textContent = outcome;
     }
 
-    function renderAll(revealDealer=false){
+    function renderAll(revealDealer=false)(){
       renderHand(dealerHandEl,dealer, inRound && !revealDealer);
       renderHand(playerHandEl,player,false);
       renderBalance();
       hitBtn.disabled = !inRound;
       standBtn.disabled = !inRound;
       dealBtn.disabled = inRound; // deal not while in round
-      placeBetBtn.disabled = inRound || betPlaced;
+      placeBetBtn.disabled = inRound;
     }
 
     // --- event wiring ---
@@ -288,16 +282,13 @@
 
     placeBetBtn.addEventListener('click',()=>{
       if(bet<=0){ flashMessage('Pick some chips first'); return; }
-      if(bet>balance){ flashMessage('Bet exceeds balance'); return; }
-      betPlaced = true;
       flashMessage(`Bet of $${bet} placed — press Deal`);
-      renderAll();
     });
 
     dealBtn.addEventListener('click',()=>{ startRound(); });
     hitBtn.addEventListener('click',()=>{ playerHit(); });
     standBtn.addEventListener('click',()=>{ if(!inRound) return; endRound('stand'); });
-    resetBtn.addEventListener('click',()=>{ bet=0; betPlaced=false; inRound=false; player=[]; dealer=[]; renderAll(true); messageEl.textContent='Cards reset — balance kept'; });
+    resetBtn.addEventListener('click',()=>{ bet=0; inRound=false; player=[]; dealer=[]; renderAll(true); messageEl.textContent='Cards reset — balance kept'; });
 
     // keyboard shortcuts (optional)
     window.addEventListener('keydown',(e)=>{

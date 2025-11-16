@@ -133,6 +133,11 @@ function displayHands(revealDealer = false) {
       if (calculateHandValue(player) > 21) {
         endGame('You lose, try again.', true);
       }
+      if (calculateHandValue(player) === 21) {
+        handleStand();
+        return;
+      }
+
     }
 
     function handleStand() {
@@ -178,5 +183,6 @@ function displayHands(revealDealer = false) {
   </script>
 </body>
 </html>
+
 
 

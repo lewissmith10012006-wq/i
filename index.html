@@ -11,37 +11,74 @@
       color: white;
       text-align: center;
       padding: 20px;
+      overflow-x: hidden;
     }
+
+    #balance {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: rgba(0,0,0,0.3);
+      padding: 10px 15px;
+      border-radius: 10px;
+    }
+
+    #clicker {
+      position: fixed;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: #00cc66;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     #game, #result, #hiddenContent {
       margin-top: 20px;
     }
+
     button {
       padding: 10px 20px;
       margin: 5px;
       font-size: 16px;
     }
+
     #hiddenContent {
       display: none;
       margin-top: 30px;
     }
+
     img {
       max-width: 300px;
       margin-top: 10px;
     }
+
     .red {
       color: red;
     }
+
     .hand-label {
       font-size: 1.4rem;
       margin-top: 20px;
     }
+
     .cards {
-      font-size: 8rem;
+      font-size: 6rem;
       margin: 10px 0;
     }
   </style>
 </head>
 <body>
+  <div id="balance">Balance: $100</div>
+  <div id="clicker" onclick="incrementBalance()"></div>
+
   <h1>🃏 Blackjack to Unlock</h1>
   <div id="game">
     <div class="hand-label">Dealer's Hand: <span id="dealerValue"></span></div>
@@ -67,6 +104,7 @@
     let dealer = [];
     let deck = [];
     let gameOver = false;
+    let balance = 100;
 
     const cardMap = {
       'A♠': '🂡', '2♠': '🂢', '3♠': '🂣', '4♠': '🂤', '5♠': '🂥', '6♠': '🂦', '7♠': '🂧', '8♠': '🂨', '9♠': '🂩', '10♠': '🂪', 'J♠': '🂫', 'Q♠': '🂭', 'K♠': '🂮',
@@ -107,21 +145,19 @@
       return hand.map(card => cardMap[card.value + card.suit]).join(' ');
     }
 
-function displayHands(revealDealer = false) {
-  const dealerDisplay = dealer.map((card, i) => {
-    if (i === 1 && !revealDealer) return '🂠'; // hide second card
-    return cardMap[card.value + card.suit];
-  }).join(' ');
+    function displayHands(revealDealer = false) {
+      const dealerDisplay = dealer.map((card, i) => {
+        if (i === 1 && !revealDealer) return '🂠';
+        return cardMap[card.value + card.suit];
+      }).join(' ');
+      const dealerValue = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
 
-  const dealerValue = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
+      document.getElementById('dealerHand').innerHTML = dealerDisplay;
+      document.getElementById('dealerValue').textContent = dealerValue;
 
-  document.getElementById('dealerHand').innerHTML = dealerDisplay;
-  document.getElementById('dealerValue').textContent = dealerValue;
-
-  document.getElementById('playerHand').innerHTML = handToString(player);
-  document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
-}
-
+      document.getElementById('playerHand').innerHTML = handToString(player);
+      document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
+    }
 
     function handleHit() {
       if (gameOver) {
@@ -129,15 +165,14 @@ function displayHands(revealDealer = false) {
         return;
       }
       player.push(deck.pop());
-      displayHands();
-      if (calculateHandValue(player) > 21) {
-        endGame('You lose, try again.', true);
-      }
-      if (calculateHandValue(player) === 21) {
-        handleStand();
-        return;
-      }
+      displayHands(false);
 
+      const playerVal = calculateHandValue(player);
+      if (playerVal > 21) {
+        endGame('You lose, try again.', true);
+      } else if (playerVal === 21) {
+        handleStand(); // auto-stand on 21
+      }
     }
 
     function handleStand() {
@@ -166,23 +201,3 @@ function displayHands(revealDealer = false) {
       result.textContent = message;
       result.className = isLoss ? 'red' : '';
       gameOver = true;
-    }
-
-    function startGame() {
-      createDeck();
-      player = [deck.pop(), deck.pop()];
-      dealer = [deck.pop(), deck.pop()];
-      document.getElementById('hiddenContent').style.display = 'none';
-      document.getElementById('result').textContent = '';
-      document.getElementById('result').className = '';
-      gameOver = false;
-      displayHands(false);
-    }
-
-    startGame();
-  </script>
-</body>
-</html>
-
-
-

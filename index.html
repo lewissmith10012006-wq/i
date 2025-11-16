@@ -28,20 +28,20 @@
       max-width: 300px;
       margin-top: 10px;
     }
-    .card {
-      font-size: 2rem;
-      margin: 0 5px;
-    }
     .red {
       color: red;
+    }
+    .cards {
+      font-size: 2rem;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
   <h1>🃏 Blackjack to Unlock</h1>
   <div id="game">
-    <p id="playerHand">Your Hand: </p>
-    <p id="dealerHand">Dealer's Hand: </p>
+    <div id="playerHand" class="cards"></div>
+    <div id="dealerHand" class="cards"></div>
     <p id="result"></p>
     <button onclick="handleHit()">Hit</button>
     <button onclick="handleStand()">Stand</button>
@@ -96,12 +96,12 @@
     }
 
     function handToString(hand) {
-      return hand.map(card => cardMap[card.value + card.suit] || (card.value + card.suit)).join(' ');
+      return hand.map(card => cardMap[card.value + card.suit]).join(' ');
     }
 
     function displayHands() {
-      document.getElementById('playerHand').innerHTML = 'Your Hand: ' + handToString(player) + ' (' + calculateHandValue(player) + ')';
-      document.getElementById('dealerHand').innerHTML = 'Dealer\'s Hand: ' + handToString(dealer) + ' (' + calculateHandValue(dealer) + ')';
+      document.getElementById('playerHand').innerHTML = `Your Hand: ${handToString(player)} (${calculateHandValue(player)})`;
+      document.getElementById('dealerHand').innerHTML = `Dealer's Hand: ${handToString(dealer)} (${calculateHandValue(dealer)})`;
     }
 
     function handleHit() {

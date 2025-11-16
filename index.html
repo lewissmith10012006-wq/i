@@ -233,13 +233,17 @@
       if(val>21){ endRound('player_bust'); }
     }
 
-    function dealerPlay(){
-      while(handValue(dealer)<17){ dealer.push(draw()); }
+    async function dealerPlay(){
+      while(handValue(dealer)<17){
+        await new Promise(r=>setTimeout(r,600));
+        dealer.push(draw());
+        renderAll(true);
+      }
+    }
     }
 
-    function endRound(reason){
-      // reveal dealer then decide
-      dealerPlay(); renderAll(false);
+    async function endRound(reason){
+      await dealerPlay(); renderAll(false);
       const p = handValue(player); const d = handValue(dealer);
       let outcome = '';
       if(reason==='player_blackjack'){
@@ -261,7 +265,7 @@
       messageEl.textContent = outcome;
     }
 
-    function renderAll(revealDealer=false){
+    function function renderAll(revealDealer=false){
       renderHand(dealerHandEl,dealer, inRound && !revealDealer);
       renderHand(playerHandEl,player,false);
       renderBalance();

@@ -107,12 +107,21 @@
       return hand.map(card => cardMap[card.value + card.suit]).join(' ');
     }
 
-    function displayHands() {
-      document.getElementById('playerHand').innerHTML = handToString(player);
-      document.getElementById('dealerHand').innerHTML = handToString(dealer);
-      document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
-      document.getElementById('dealerValue').textContent = `(${calculateHandValue(dealer)})`;
-    }
+function displayHands(revealDealer = false) {
+  const dealerDisplay = dealer.map((card, i) => {
+    if (i === 1 && !revealDealer) return '🂠'; // hide second card
+    return cardMap[card.value + card.suit];
+  }).join(' ');
+
+  const dealerValue = revealDealer ? `(${calculateHandValue(dealer)})` : '(?)';
+
+  document.getElementById('dealerHand').innerHTML = dealerDisplay;
+  document.getElementById('dealerValue').textContent = dealerValue;
+
+  document.getElementById('playerHand').innerHTML = handToString(player);
+  document.getElementById('playerValue').textContent = `(${calculateHandValue(player)})`;
+}
+
 
     function handleHit() {
       if (gameOver) {
@@ -134,7 +143,7 @@
       while (calculateHandValue(dealer) < 17) {
         dealer.push(deck.pop());
       }
-      displayHands();
+      displayHands(true);
       const playerVal = calculateHandValue(player);
       const dealerVal = calculateHandValue(dealer);
       if (dealerVal > 21 || playerVal > dealerVal) {
@@ -162,11 +171,12 @@
       document.getElementById('result').textContent = '';
       document.getElementById('result').className = '';
       gameOver = false;
-      displayHands();
+      displayHands(false);
     }
 
     startGame();
   </script>
 </body>
 </html>
+
 
